@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geometrischer Nikolaus - Bart Korrektur</title>
+    <style>
+        /* --- GRUNDLAYOUT & HINTERGRUND (Unverändert) --- */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: radial-gradient(circle at 50% 30%, #34495e 0%, #1a252f 80%);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        .background-elements {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; overflow: hidden;
+        }
+        .bg-tree {
+            position: absolute; bottom: -50px; width: 0; height: 0;
+            border-style: solid; border-color: transparent transparent #243442 transparent;
+            filter: blur(4px); opacity: 0.6;
+        }
+        .tree-1 { left: 10%; border-width: 0 60px 180px 60px; }
+        .tree-2 { left: 75%; border-width: 0 80px 220px 80px; bottom: -70px; }
+        .tree-3 { left: 45%; border-width: 0 40px 120px 40px; bottom: -30px; opacity: 0.4; }
+        .snow {
+            position: absolute; top: -20px; width: 10px; height: 10px;
+            background: rgba(255,255,255,0.3); border-radius: 50%; animation: fall linear infinite;
+        }
+        .s1 { left: 20%; animation-duration: 10s; animation-delay: 0s; scale: 0.8; }
+        .s2 { left: 50%; animation-duration: 15s; animation-delay: 2s; scale: 0.5; }
+        .s3 { left: 80%; animation-duration: 12s; animation-delay: 5s; scale: 1; }
+        @keyframes fall { to { transform: translateY(110vh); } }
+
+        /* --- SZENE CONTAINER --- */
+        .scene {
+            position: relative;
+            display: flex; flex-direction: column; align-items: center;
+            margin-top: 60px;
+            animation: idleFloat 4s ease-in-out infinite;
+        }
+        .scene.is-talking-body {
+            animation: subtleTalk 0.2s infinite alternate;
+        }
+        @keyframes idleFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes subtleTalk {
+             0% { transform: translateY(0); }
+             100% { transform: translateY(-1px); }
+        }
+
+        /* --- SPRECHBLASE --- */
+        .bubble {
+            background: #ffffff; border-radius: 25px; padding: 25px 30px;
+            min-width: 300px; max-width: 450px; text-align: center;
+            font-size: 1.3rem; line-height: 1.4; color: #2c3e50;
+            margin-bottom: 45px; position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 500; opacity: 0;
+            transform: translateY(20px) scale(0.9); transform-origin: bottom center;
+        }
+        .bubble::after {
+            content: ''; position: absolute; bottom: -18px; left: 50%;
+            transform: translateX(-50%); border-width: 18px 18px 0;
+            border-style: solid; border-color: #ffffff transparent;
+        }
+        .bubble.visible { animation: bubblePopIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        .bubble.hiding { animation: bubbleFadeOut 0.4s ease forwards; }
+        @keyframes bubblePopIn {
+            0% { opacity: 0; transform: translateY(40px) scale(0.7); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes bubbleFadeOut {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(20px) scale(0.9); }
+        }
+
+        /* --- NIKOLAUS (Geometrisch) --- */
+        .santa {
+            position: relative; width: 240px; height: 300px;
+            filter: drop-shadow(0 15px 15px rgba(0,0,0,0.3));
+        }
+        :root {
+            --skin-color: #ffdfbf; --santa-red: #c0392b; --santa-red-dark: #962d22;
+            --beard-white: #f4f7f6; --beard-shadow: #ddeae8;
+        }
+
+        .hat {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0;
+            border-left: 90px solid transparent; border-right: 90px solid transparent;
+            border-bottom: 140px solid var(--santa-red); z-index: 10;
+        }
+
+        .hat-trim {
+            position: absolute; top: 115px; left: 50%; transform: translateX(-50%);
+            width: 190px; height: 35px;
+            background: var(--beard-white); border-radius: 25px;
+            z-index: 11; box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .pom-pom {
+            position: absolute; top: -25px; left: 50%; transform: translateX(-50%);
+            width: 45px; height: 45px; background: var(--beard-white);
+            border-radius: 50%; z-index: 12; box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+
+        .face {
+            position: absolute; top: 145px; left: 50%; transform: translateX(-50%);
+            width: 150px; height: 120px; background: var(--skin-color);
+            border-radius: 0 0 75px 75px; z-index: 5;
+            box-shadow: inset 0 8px 10px rgba(0,0,0,0.1);
+        }
+
+        /* KORREKTUR: Bart weiter nach unten geschoben (von 190px auf 210px) */
+        .beard {
+            position: absolute; top: 210px; left: 50%; transform: translateX(-50%);
+            width: 210px; height: 120px;
+            background: linear-gradient(to bottom, var(--beard-white) 20%, var(--beard-shadow) 100%);
+            border-radius: 0 0 105px 105px; z-index: 4;
+        }
+
+        .eye {
+            position: absolute; top: 30px;
+            width: 16px; height: 16px; background: #333; border-radius: 50%;
+            animation: blink 4s infinite;
+        }
+        .eye.left { left: 35px; } .eye.right { right: 35px; }
+
+        @keyframes blink {
+            0%, 48%, 52%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.1); }
+        }
+
+        .nose {
+            position: absolute; top: 75px; left: 50%; transform: translateX(-50%);
+            width: 26px; height: 22px; background: #ffaaa5; border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .cheek {
+            position: absolute; top: 80px; width: 32px; height: 22px;
+            background: #ffcccb; border-radius: 50%; opacity: 0.5;
+        }
+        .cheek.left { left: 10px; } .cheek.right { right: 10px; }
+
+        .mouth {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 24px; height: 6px; background: #7c1e1e; border-radius: 10px;
+            transition: all 0.1s ease-in-out; z-index: 7;
+        }
+        .mouth.talking { animation: talk 0.4s infinite alternate ease-in-out; }
+        @keyframes talk {
+            0% { height: 6px; border-radius: 10px; bottom: 20px; }
+            100% { height: 12px; border-radius: 20px; bottom: 18px; }
+        }
+
+        /* KORREKTUR: Schnurrbart weiter nach unten geschoben (von 180px auf 200px) */
+        .moustache {
+            position: absolute; top: 200px; left: 50%; transform: translateX(-50%);
+            width: 170px; height: 45px; z-index: 8;
+            display: flex; justify-content: center;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.15));
+        }
+        .moustache-part {
+            width: 85px; height: 45px; background: var(--beard-white);
+            border-radius: 45px 45px 0 0;
+        }
+        .moustache-part.left { transform: rotate(-12deg) translateX(5px); }
+        .moustache-part.right { transform: rotate(12deg) translateX(-5px); }
+
+        .body {
+            position: absolute; bottom: -60px; left: 50%; transform: translateX(-50%);
+            width: 260px; height: 120px;
+            background: linear-gradient(to bottom, var(--santa-red) 0%, var(--santa-red-dark) 100%);
+            border-radius: 130px 130px 0 0; z-index: 3; overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-elements">
+        <div class="bg-tree tree-1"></div>
+        <div class="bg-tree tree-2"></div>
+        <div class="bg-tree tree-3"></div>
+        <div class="snow s1"></div>
+        <div class="snow s2"></div>
+        <div class="snow s3"></div>
+    </div>
+
+    <div class="scene" id="sceneContainer">
+        <div class="bubble" id="bubble">...</div>
+        
+        <div class="santa">
+            <div class="pom-pom"></div>
+            <div class="hat"></div>
+            <div class="hat-trim"></div>
+            
+            <div class="face">
+                <div class="cheek left"></div>
+                <div class="cheek right"></div>
+                <div class="eye left"></div>
+                <div class="eye right"></div>
+                <div class="nose"></div>
+                <div class="mouth" id="mouth"></div>
+            </div>
+            
+            <div class="moustache">
+                <div class="moustache-part left"></div>
+                <div class="moustache-part right"></div>
+            </div>
+            <div class="beard"></div>
+            <div class="body"></div>
+        </div>
+    </div>
+
+    <script>
+        const bubble = document.getElementById('bubble');
+        const mouth = document.getElementById('mouth');
+        const sceneContainer = document.getElementById('sceneContainer');
+
+        /* TEXTSEQUENZ (Unverändert) */
+        const sequence = [
+            { text: "Willkommen zur Nikolausaktion!", duration: 3000, pause: 2000 },
+            { text: "Hier könnt ihr euren Freundinnen oder Freunden, Geschwistern oder auch anderen Schülerinnen und Schülern, aber natürlich auch Lehrerinnen und Lehrern des Gymnasiums Nikoläuse oder Zuckerstangen verschenken.", duration: 12000, pause: 1500 },
+            { text: "Kauft dafür als erstes einen der roten oder pinken Zettel.", duration: 4500, pause: 1000 },
+            { text: "Mit diesem Zettel geht ihr dann in den zweiten Raum und füllt euren Zettel aus.", duration: 5500, pause: 1000 },
+            { text: "Dafür schreibt ihr den Namen der Empfängerin oder des Empfängers mit der Klasse in das vorgesehene Feld.", duration: 7000, pause: 1000 },
+            { text: "Danach könnt ihr noch eine persönliche Nachricht und euren Namen ergänzen.", duration: 5500, pause: 2000 },
+            { text: "Zum Schluss gebt ihr euren Zettel am Ausgang ab.", duration: 4000, pause: 1000 },
+            { text: "Solltet ihr eure Zettel erst zu Hause ausfüllen wollen, sprecht uns beim Verkauf an.", duration: 6000, pause: 1000 }
+        ];
+
+        function wait(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function playSegment(segment) {
+            bubble.classList.remove('hiding');
+            bubble.innerText = segment.text;
+            
+            bubble.classList.add('visible');
+            mouth.classList.add('talking');
+            sceneContainer.classList.add('is-talking-body');
+
+            await wait(segment.duration);
+
+            mouth.classList.remove('talking');
+            sceneContainer.classList.remove('is-talking-body');
+            
+            bubble.classList.remove('visible');
+            bubble.classList.add('hiding');
+            
+            await wait(400);
+            
+            const remainingPause = Math.max(0, segment.pause - 400);
+            await wait(remainingPause);
+        }
+
+        async function startShow() {
+            bubble.classList.remove('visible', 'hiding');
+            
+            for (let item of sequence) {
+                await playSegment(item);
+            }
+            bubble.classList.remove('visible');
+            bubble.classList.add('hiding');
+        }
+
+        startShow();
+        setInterval(startShow, 120000); 
+
+    </script>
+</body>
+</html>
